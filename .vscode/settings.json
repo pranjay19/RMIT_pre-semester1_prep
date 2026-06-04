@@ -1,0 +1,8 @@
+{
+  "gitlens.views.branches.visible": true,
+  "gitlens.views.commits.visible": true,
+  "gitlens.views.graph.visible": true,
+  "gitlens.views.remotes.visible": true,
+  "gitlens.views.tags.visible": true,
+  "gitlens.views.searchAndCompare.visible": true
+}
