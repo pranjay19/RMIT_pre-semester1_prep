@@ -1,0 +1,29 @@
+#EASY Questions
+
+Question 1: Histogram of Tweets
+
+solution: 
+
+with table_1 as
+(
+select *
+from tweets
+where EXTRACT(YEAR from tweet_date)=2022
+) ,
+table_2 AS
+(
+select *
+FROM
+table_1
+)
+, table_3 as
+(
+select user_id, count(tweet_id) as tweet_bucket
+from table_2
+group by user_id
+)
+
+select tweet_bucket , count(user_id) as users_num
+from table_3
+group by tweet_bucket 
+
