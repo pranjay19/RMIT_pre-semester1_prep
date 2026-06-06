@@ -27,3 +27,35 @@ select tweet_bucket , count(user_id) as users_num
 from table_3
 group by tweet_bucket 
 
+
+Question 2: Data Science Skills
+
+solution: 
+
+
+with table_1 as (
+
+select * , 
+
+(
+case  
+when skill='Python' or skill='Tableau' or skill='PostgreSQL' then 1
+else 0
+end
+) as count
+from candidates
+
+)
+
+,
+
+table_2 AS
+(
+select candidate_id, sum(count)
+from table_1
+group by candidate_id
+)
+
+select candidate_id
+FROM table_2
+where sum=3
