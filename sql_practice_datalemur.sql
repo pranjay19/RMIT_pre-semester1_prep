@@ -59,3 +59,33 @@ group by candidate_id
 select candidate_id
 FROM table_2
 where sum=3
+
+
+-- Question 3: Page With No Likes
+
+-- solution: 
+
+
+with table_1 as 
+(
+
+select pages.page_id, liked_date
+from pages left join page_likes
+on pages.page_id=page_likes.page_id
+
+)
+,
+
+table_2 AS
+(
+select page_id
+FROM table_1
+group by page_id
+having count(liked_date)=0
+order by page_id 
+)
+
+
+SELECT *
+FROM
+TABLE_2
