@@ -1,8 +1,8 @@
-#EASY Questions
+-- #EASY Questions
 
-Question 1: Histogram of Tweets
+-- Question 1: Histogram of Tweets
 
-solution: 
+-- solution: 
 
 with table_1 as
 (
@@ -28,9 +28,9 @@ from table_3
 group by tweet_bucket 
 
 
-Question 2: Data Science Skills
+-- Question 2: Data Science Skills
 
-solution: 
+-- solution: 
 
 
 with table_1 as (
