@@ -89,3 +89,9 @@ order by page_id
 SELECT *
 FROM
 TABLE_2
+
+
+-- Question 4: Unfinished Parts
+
+-- solution: 
+
