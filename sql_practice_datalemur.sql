@@ -90,8 +90,6 @@ WHERE finish_date IS NULL;
 
 -- solution: 
 
-
-
 WITH table_1 AS (
   SELECT 
     *, 
@@ -109,3 +107,34 @@ SELECT
   SUM(laptop) AS laptop_views, 
   SUM(mobile) AS mobile_views
 FROM table_1;
+
+-- Question 6: Average Post Hiatus (Part 1)
+
+-- solution: 
+
+
+WITH table_1 AS (
+  SELECT 
+    p1.user_id, 
+    p1.post_id, 
+    p1.post_content, 
+    p1.post_date AS start_date, 
+    p2.post_date AS end_date
+  FROM posts AS p1 
+  JOIN posts AS p2 
+    ON p1.user_id = p2.user_id
+  WHERE EXTRACT(YEAR FROM p1.post_date) = 2021 
+    AND EXTRACT(YEAR FROM p2.post_date) = 2021
+),
+table_2 AS (
+  SELECT 
+    user_id, 
+    EXTRACT(DAY FROM MAX(end_date) - MIN(start_date)) AS days_between
+  FROM table_1
+  WHERE start_date != end_date
+  GROUP BY user_id
+  HAVING EXTRACT(DAY FROM MAX(end_date) - MIN(start_date)) != 0
+)
+SELECT *
+FROM table_2
+ORDER BY days_between;
