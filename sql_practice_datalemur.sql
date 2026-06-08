@@ -4,104 +4,108 @@
 
 -- solution: 
 
-with table_1 as
-(
-select *
-from tweets
-where EXTRACT(YEAR from tweet_date)=2022
-) ,
-table_2 AS
-(
-select *
-FROM
-table_1
+WITH table_1 AS (
+  SELECT *
+  FROM tweets
+  WHERE EXTRACT(YEAR FROM tweet_date) = 2022
+),
+table_2 AS (
+  SELECT *
+  FROM table_1
+),
+table_3 AS (
+  SELECT 
+    user_id, 
+    COUNT(tweet_id) AS tweet_bucket
+  FROM table_2
+  GROUP BY user_id
 )
-, table_3 as
-(
-select user_id, count(tweet_id) as tweet_bucket
-from table_2
-group by user_id
-)
-
-select tweet_bucket , count(user_id) as users_num
-from table_3
-group by tweet_bucket 
+SELECT 
+  tweet_bucket, 
+  COUNT(user_id) AS users_num
+FROM table_3
+GROUP BY tweet_bucket;
 
 
 -- Question 2: Data Science Skills
 
 -- solution: 
 
-
-with table_1 as (
-
-select * , 
-
-(
-case  
-when skill='Python' or skill='Tableau' or skill='PostgreSQL' then 1
-else 0
-end
-) as count
-from candidates
-
+WITH table_1 AS (
+  SELECT 
+    *, 
+    CASE  
+      WHEN skill = 'Python' OR skill = 'Tableau' OR skill = 'PostgreSQL' THEN 1
+      ELSE 0
+    END AS count
+  FROM candidates
+),
+table_2 AS (
+  SELECT 
+    candidate_id, 
+    SUM(count) AS sum
+  FROM table_1
+  GROUP BY candidate_id
 )
-
-,
-
-table_2 AS
-(
-select candidate_id, sum(count)
-from table_1
-group by candidate_id
-)
-
-select candidate_id
+SELECT candidate_id
 FROM table_2
-where sum=3
+WHERE sum = 3;
 
 
 -- Question 3: Page With No Likes
 
 -- solution: 
 
-
-with table_1 as 
-(
-
-select pages.page_id, liked_date
-from pages left join page_likes
-on pages.page_id=page_likes.page_id
-
+WITH table_1 AS (
+  SELECT 
+    pages.page_id, 
+    page_likes.liked_date
+  FROM pages 
+  LEFT JOIN page_likes 
+    ON pages.page_id = page_likes.page_id
+),
+table_2 AS (
+  SELECT page_id
+  FROM table_1
+  GROUP BY page_id
+  HAVING COUNT(liked_date) = 0
+  ORDER BY page_id 
 )
-,
-
-table_2 AS
-(
-select page_id
-FROM table_1
-group by page_id
-having count(liked_date)=0
-order by page_id 
-)
-
-
 SELECT *
-FROM
-TABLE_2
+FROM table_2;
 
 
 -- Question 4: Unfinished Parts
 
 -- solution: 
 
+SELECT 
+  part, 
+  assembly_step
+FROM parts_assembly
+WHERE finish_date IS NULL;
 
-select part, assembly_step
-FROM
-parts_assembly
-where finish_date is null
 
 -- Question 5: Laptop vs. Mobile Viewership
 
 -- solution: 
 
+
+
+WITH table_1 AS (
+  SELECT 
+    *, 
+    CASE 
+      WHEN device_type = 'laptop' THEN 1
+      ELSE 0
+    END AS laptop, 
+    CASE 
+      WHEN device_type IN ('tablet', 'phone') THEN 1
+      ELSE 0
+    END AS mobile
+  FROM viewership
+)
+SELECT 
+  SUM(laptop) AS laptop_views, 
+  SUM(mobile) AS mobile_views
+FROM table_1;
