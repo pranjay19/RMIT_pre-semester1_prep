@@ -138,3 +138,8 @@ table_2 AS (
 SELECT *
 FROM table_2
 ORDER BY days_between;
+
+-- Question 7: Teams Power Users
+
+-- solution:
+
