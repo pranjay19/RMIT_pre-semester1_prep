@@ -95,3 +95,13 @@ TABLE_2
 
 -- solution: 
 
+
+select part, assembly_step
+FROM
+parts_assembly
+where finish_date is null
+
+-- Question 5: Laptop vs. Mobile Viewership
+
+-- solution: 
+
