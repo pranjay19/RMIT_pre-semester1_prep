@@ -1,0 +1,26 @@
+Table Customers [headercolor: #3b82f6] {
+  unique_id string [pk]
+  Full_Name string
+  Email_address string 
+}
+
+Table Book [headercolor: #ef4444] {
+  ISBN_code string [pk]
+  title string
+  price number
+}
+
+Table Orders [headercolor: #eab308] {
+  order_id string [pk]
+  unique_id string
+  order_placed timestamp
+}
+
+Table Order_items [headercolor: #a855f7] {
+  order_id string
+  ISBN_code string
+}
+
+Ref: Customers.unique_id < Orders.unique_id
+Ref: Book.ISBN_code < Order_items.ISBN_code
+Ref: Orders.order_id < Order_items.order_id
