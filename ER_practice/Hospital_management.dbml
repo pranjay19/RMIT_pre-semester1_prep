@@ -1,0 +1,32 @@
+Table Patients [headercolor: #3b82f6] {
+  patient_id string [pk]
+  name string
+  DOB timestamp
+  blood_type string
+}
+Table Doctors [headercolor: #ef4444] {
+  doctor_id string [pk]
+  name string
+  specialty string
+}
+Table Appointments [headercolor: #f97316] {
+  appointment_id string [pk]
+  doctor_id string
+  patient_id string
+  Date_time timestamp
+  reason_for_visit string
+}
+Table Medication [headercolor: #9ca3af] {
+  medication_id string [pk]
+  Name string
+  dosage_strength string
+}
+Table Prescriptions [headercolor: #10b981] {
+  prescription_id string [pk]
+  appointment_id string
+  medication_id string
+}
+Ref: Patients.patient_id < Appointments.patient_id
+Ref: Doctors.doctor_id < Appointments.doctor_id
+Ref: Appointments.appointment_id < Prescriptions.appointment_id
+Ref: Medication.medication_id < Prescriptions.medication_id
