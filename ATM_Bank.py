@@ -40,7 +40,25 @@ def deposit_money():
 
 
 def withdraw_money():
-    print("Hello")
+    
+    account_type=input("Please enter the account type savings/current: ")
+
+    if account_type in accounts:
+        
+        try:
+            Amount=float(input("Please enter the amount to be withdrawn: "))
+            if Amount>accounts[account_type]:
+                print(f"❌ Error: You do not have sufficent funds for this transaction.!")
+            else:
+                accounts[account_type]-=Amount
+                print(f"Withdrawal of {Amount} from your {account_type} account was successfull!")
+                print(f"Your new balance in {account_type} is {accounts[account_type]}")
+
+        except ValueError:  
+            print(("❌ Error: Please enter a valid number."))
+
+    else:
+        print(f"❌ Error: '{account_type}' account not found.")
 
 
 # ----- Main program ------
