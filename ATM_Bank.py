@@ -1,111 +1,196 @@
-accounts={
-    "current":500.00,
-    "savings":1500.00
-}
+import streamlit as st
+import pandas as pd
+import datetime
+import plotly.express as px
 
-def check_balance():
+# Configure the page layout to wide and set the title/icon
+st.set_page_config(page_title="Nexus FinTech Portal", page_icon="🏦", layout="wide")
 
-    account_type=input("Please enter the account type savings/current: ")
+# ----------------------------------------------------
+# Session State Initialization
+# ----------------------------------------------------
+if 'accounts' not in st.session_state:
+    st.session_state.accounts = {
+        "Current": 500.00,
+        "Savings": 1500.00
+    }
+if 'pin_attempts' not in st.session_state:
+    st.session_state.pin_attempts = 3
+if 'logged_in' not in st.session_state:
+    st.session_state.logged_in = False
+if 'card_blocked' not in st.session_state:
+    st.session_state.card_blocked = False
+if 'transactions' not in st.session_state:
+    st.session_state.transactions = []
 
-    if account_type in accounts:
-        print(f"Your balance in your {account_type} is: {accounts[account_type]}")
-        
-    else:
-        print(f"❌ Error: '{account_type}' account not found.")
-        
+# Helper Function: Add transaction to history
+def add_transaction(acc_type, trans_type, amount, balance_after):
+    st.session_state.transactions.append({
+        "Timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "Account": acc_type,
+        "Type": trans_type,
+        "Amount": f"${amount:.2f}",
+        "Balance After": f"${balance_after:.2f}"
+    })
 
+# ----------------------------------------------------
+# Custom Styling for "Futuristic FinTech" Look
+# ----------------------------------------------------
+st.markdown("""
+<style>
+    /* Sleek container styles for metrics */
+    div[data-testid="stMetricValue"] {
+        color: #00e5ff;
+        font-size: 2rem;
+    }
+    div[data-testid="stMetricLabel"] {
+        color: #b0bec5;
+        font-size: 1rem;
+        font-weight: bold;
+    }
     
+    /* Headers and Dividers styling */
+    h1, h2, h3 {
+        color: #e0f7fa !important;
+        font-family: 'Courier New', Courier, monospace;
+    }
+    hr {
+        border-color: #00e5ff !important;
+    }
+</style>
+""", unsafe_allow_html=True)
 
-def deposit_money():
+# ----------------------------------------------------
+# Application Logic
+# ----------------------------------------------------
+if not st.session_state.logged_in:
+    # --- Login Screen ---
+    st.title("🌐 Nexus Secure Terminal")
+    st.divider()
     
-    account_type=input("Please enter the account type savings/current: ")
-
-    if account_type in accounts:
-        try:
-            Amount=float(input("Please enter the amount to be added: "))
-
-            if Amount>0:
-                accounts[account_type]+=Amount
-            else:
-                print(f"❌ Error: Deposit amount must be greater than zero.")
-
-
-
-        except ValueError:
-            print(("❌ Error: Please enter a valid number.")) 
-
-
-    else:
-        print(f"❌ Error: '{account_type}' account not found.")
-
-
-def withdraw_money():
+    # Use columns to center the login box
+    col1, col2, col3 = st.columns([1, 2, 1])
     
-    account_type=input("Please enter the account type savings/current: ")
-
-    if account_type in accounts:
+    with col2:
+        st.subheader("🔐 User Authentication")
         
-        try:
-            Amount=float(input("Please enter the amount to be withdrawn: "))
-            if Amount>accounts[account_type]:
-                print(f"❌ Error: You do not have sufficent funds for this transaction.!")
-            else:
-                accounts[account_type]-=Amount
-                print(f"Withdrawal of {Amount} from your {account_type} account was successfull!")
-                print(f"Your new balance in {account_type} is {accounts[account_type]}")
-
-        except ValueError:  
-            print(("❌ Error: Please enter a valid number."))
-
-    else:
-        print(f"❌ Error: '{account_type}' account not found.")
-
-
-# ----- Main program ------
-
-import sys
-
-print(f"Welcome to Python Bank !")
-
-PIN_attempts=3
-
-while PIN_attempts>0:
-
-    PIN=input("Please enter the 4 digit pin: ")
-
-
-    if PIN=="1234":
-        print(f"Access granted successfully !")
-        break
-    else:
-        PIN_attempts-=1
-        
-        if PIN_attempts > 0:
-            print(f"The entered PIN is wrong ! , pls try again & you have {PIN_attempts} attempts remaining.")
+        if st.session_state.card_blocked:
+            st.error("🚫 ACCESS TERMINATED. Card blocked due to multiple security violations.")
         else:
-            print("Card blocked due to consicutive 3 wrong attempts !")
-            sys.exit()
+            st.info(f"Security clearance required. Attempts remaining: **{st.session_state.pin_attempts}**")
+            
+            pin = st.text_input("Enter 4-Digit Security Code (Hint: 1234):", type="password")
+            
+            if st.button("Authenticate", use_container_width=True, type="primary"):
+                if pin == "1234":
+                    st.session_state.logged_in = True
+                    st.success("✅ Authentication successful. Establishing secure connection...")
+                    st.rerun()
+                else:
+                    st.session_state.pin_attempts -= 1
+                    if st.session_state.pin_attempts > 0:
+                        st.error("❌ Invalid security code. Please try again.")
+                    else:
+                        st.session_state.card_blocked = True
+                        st.error("🚫 ACCESS TERMINATED. Card blocked.")
+                    st.rerun()
 
-# ---- Inside Program ----
+else:
+    # --- Main FinTech Dashboard ---
+    st.title("🌌 Nexus Wealth Management")
+    st.divider()
 
-while True:
-    print(f"Please choose from the below options: ")
-    print("1. Check Balance")
-    print("2. Deposit Money")
-    print("3. Withdraw Money")
-    print("4. Return Card")
+    # Calculate portfolio values
+    current_bal = st.session_state.accounts["Current"]
+    savings_bal = st.session_state.accounts["Savings"]
+    total_wealth = current_bal + savings_bal
 
-    option=input("please enter the option to choose 1-4: ")
+    # 1. Top Metrics Cards
+    metric_col1, metric_col2, metric_col3 = st.columns(3)
+    
+    with metric_col1:
+        st.metric(label="Total Portfolio Value", value=f"${total_wealth:,.2f}")
+    with metric_col2:
+        st.metric(label="Current Account", value=f"${current_bal:,.2f}")
+    with metric_col3:
+        st.metric(label="Savings Account", value=f"${savings_bal:,.2f}")
 
-    if option=='1':
-        check_balance()
-    elif option=='2':
-        deposit_money()
-    elif option=='3':
-        withdraw_money()
-    elif option=='4':
-        print("card returned successfully!")
-        break
-    else:
-        print("Please enter a valid option to choose !")
+    st.divider()
 
+    # 2. Main Dual-Column Layout
+    left_col, right_col = st.columns([2, 1])
+
+    with left_col:
+        st.subheader("⚡ Quick Operations")
+        
+        # Expanders for clutter-free UI
+        with st.expander("📥 Deposit Funds", expanded=False):
+            dep_acc = st.selectbox("Destination Account:", ["Current", "Savings"], key="dep_acc")
+            dep_amt = st.number_input("Amount to Deposit ($):", min_value=0.0, step=10.0, format="%.2f", key="dep_amt")
+            if st.button("Execute Deposit", type="primary"):
+                if dep_amt > 0:
+                    st.session_state.accounts[dep_acc] += dep_amt
+                    add_transaction(dep_acc, "Deposit 📥", dep_amt, st.session_state.accounts[dep_acc])
+                    st.success(f"✅ Successfully deposited ${dep_amt:.2f} into {dep_acc}.")
+                    st.rerun()
+                else:
+                    st.error("❌ Error: Deposit amount must be greater than zero.")
+                    
+        with st.expander("📤 Withdraw Funds", expanded=False):
+            with_acc = st.selectbox("Source Account:", ["Current", "Savings"], key="with_acc")
+            with_amt = st.number_input("Amount to Withdraw ($):", min_value=0.0, step=10.0, format="%.2f", key="with_amt")
+            if st.button("Execute Withdrawal", type="primary"):
+                if with_amt <= 0:
+                    st.error("❌ Error: Please enter a valid positive amount.")
+                elif with_amt > st.session_state.accounts[with_acc]:
+                    st.error("❌ Error: Insufficient liquidity for this transaction.")
+                else:
+                    st.session_state.accounts[with_acc] -= with_amt
+                    add_transaction(with_acc, "Withdrawal 📤", -with_amt, st.session_state.accounts[with_acc])
+                    st.success(f"✅ Successfully withdrew ${with_amt:.2f} from {with_acc}.")
+                    st.rerun()
+
+        st.subheader("📜 Transaction Ledger")
+        if len(st.session_state.transactions) > 0:
+            # Create a dataframe and reverse it to show newest transactions first
+            df_transactions = pd.DataFrame(st.session_state.transactions)
+            st.dataframe(
+                df_transactions.iloc[::-1], 
+                use_container_width=True, 
+                hide_index=True
+            )
+        else:
+            st.info("No recent ledger activity detected.")
+
+    with right_col:
+        st.subheader("📊 Asset Allocation")
+        
+        # Plotly Donut Chart
+        df_assets = pd.DataFrame({
+            "Account": ["Current", "Savings"],
+            "Balance": [current_bal, savings_bal]
+        })
+        
+        fig = px.pie(
+            df_assets, 
+            values="Balance", 
+            names="Account", 
+            hole=0.6,
+            color_discrete_sequence=["#00e5ff", "#7e57c2"]
+        )
+        # Make the background transparent for the futuristic theme
+        fig.update_layout(
+            margin=dict(t=20, b=20, l=20, r=20),
+            paper_bgcolor="rgba(0,0,0,0)",
+            plot_bgcolor="rgba(0,0,0,0)",
+            font=dict(color="#b0bec5")
+        )
+        st.plotly_chart(fig, use_container_width=True)
+
+        st.divider()
+        st.subheader("🔒 Terminal Access")
+        if st.button("End Secure Session (Logout)", use_container_width=True):
+            st.session_state.logged_in = False
+            st.session_state.pin_attempts = 3
+            st.success("Session terminated securely.")
+            st.rerun()
