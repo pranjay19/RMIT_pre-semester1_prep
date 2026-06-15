@@ -143,3 +143,18 @@ ORDER BY days_between;
 
 -- solution:
 
+
+
+with table_1 as (
+
+select sender_id, count(content) as count_messages
+from messages
+where extract(month from sent_date)=8 and extract(year from sent_date)=2022
+group by sender_id
+
+)
+
+select * 
+from table_1
+order by count_messages desc
+limit 2
