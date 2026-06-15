@@ -202,3 +202,13 @@ from table_1
 group by city
 order by count(order_id) DESC
 limit 3
+
+--- Question 10: Average Review Ratings
+
+--- solution: 
+
+select extract(month from submit_date) as mth , product_id as product , round(avg(stars),2) as avg_stars
+from reviews
+group by extract(month from submit_date), product_id
+order by mth,product
+
