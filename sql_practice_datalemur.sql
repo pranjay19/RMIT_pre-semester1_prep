@@ -158,3 +158,47 @@ select *
 from table_1
 order by count_messages desc
 limit 2
+
+
+--- Question 8: Duplicate Job Listings
+
+--- solution: 
+
+
+with table_1 AS
+(
+select count(job_id) as repeated
+FROM
+job_listings
+group by company_id,title,description
+having count(job_id)>1
+)
+
+select count(repeated) as duplicate_companies
+FROM
+table_1
+
+
+--- Question 9: Cities With Completed Trades
+
+--- solution: 
+
+
+with table_1 AS
+(
+select city, trades.order_id as order_id
+FROM
+trades
+left join users
+
+on trades.user_id=users.user_id
+
+where status = 'Completed'
+)
+
+
+select city, count(order_id) as total_orders
+from table_1
+group by city
+order by count(order_id) DESC
+limit 3
