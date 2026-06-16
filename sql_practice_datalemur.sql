@@ -212,3 +212,33 @@ from reviews
 group by extract(month from submit_date), product_id
 order by mth,product
 
+--- Question 11: Well Paid Employees
+
+--- solution: 
+
+
+
+with table_1 as (
+
+select e1.employee_id, e1.name
+
+FROM
+employee as e1
+
+ left join employee as e2
+
+on e1.manager_id=e2.employee_id
+
+where e1.manager_id is not null and e1.salary > e2.salary
+
+
+)
+
+select *
+FROM
+table_1
+
+
+--- Question 12: Final Account Balance
+
+--- solution: 
