@@ -254,3 +254,38 @@ SELECT
 FROM transactions
 GROUP BY account_id;
 
+--- Question 13: App Click-through Rate (CTR)
+
+--- solution: 
+
+
+
+with table_1 AS
+(
+select app_id, event_type, count(timestamp) as no_of_imp_clk
+FROM
+events
+where extract(year from timestamp)=2022
+group by app_id, event_type
+)
+
+, table_2 AS
+
+(
+select T1.app_id, T1.event_type as event_click, T1.no_of_imp_clk as click_rate, T2.event_type as event_imp, T2.no_of_imp_clk as imp_rate
+from 
+table_1 as T1
+join 
+table_1 as T2
+
+on T1.app_id=T2.app_id
+
+where T1.event_type='click' and T2.event_type='impression'
+
+)
+
+
+select app_id, round(((click_rate * 100.0 )/imp_rate),2)  as ctr
+from 
+table_2
+order by round(((click_rate * 100.0 )/imp_rate),2) 
