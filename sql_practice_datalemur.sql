@@ -289,3 +289,9 @@ select app_id, round(((click_rate * 100.0 )/imp_rate),2)  as ctr
 from 
 table_2
 order by round(((click_rate * 100.0 )/imp_rate),2) 
+
+
+--- Question 14: Second Day Confirmation
+
+--- solution:
+
